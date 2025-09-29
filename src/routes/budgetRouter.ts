@@ -7,11 +7,20 @@ import {
   validateBudgetId,
   validateBudgetInput,
 } from "../middleware/budget";
+import { ExpensesController } from "../controllers/ExpenseController";
+import {
+  validateExpenseExist,
+  validateExpenseId,
+  validateExpenseInput,
+} from "../middleware/expense";
 
 const router = Router();
 
 router.param("budgetId", validateBudgetId);
 router.param("budgetId", validateBudgetExist);
+
+router.param("expenseId", validateExpenseId);
+router.param("expenseId", validateExpenseExist);
 
 router.get("/", BudgetController.getAll);
 
@@ -19,22 +28,29 @@ router.post("/", validateBudgetInput, BudgetController.create);
 
 router.get("/:budgetId", BudgetController.getById);
 
-router.put(
-  "/:budgetId",
-  body("name")
-    .notEmpty()
-    .withMessage("El nombre  del presupuesto no puede estar vacío"),
-  body("amount")
-    .notEmpty()
-    .withMessage("El monto del presupuesto no puede estar vacío")
-    .isNumeric()
-    .withMessage("Cantidad no válida")
-    .custom((value) => value > 0)
-    .withMessage("El monto debe ser mayor que cero"),
-  handleInputErrors,
-  BudgetController.updateById
-);
+router.put("/:budgetId", validateBudgetInput, BudgetController.updateById);
 
 router.delete("/:budgetId", BudgetController.deleteById);
+
+// Routes for Expenses
+// router.get("/:budgetId/expenses", ExpensesController.getAll);
+
+router.post(
+  "/:budgetId/expenses",
+  validateExpenseInput,
+  handleInputErrors,
+  ExpensesController.create
+);
+
+router.get("/:budgetId/expenses/:expenseId", ExpensesController.getById);
+
+router.put(
+  "/:budgetId/expenses/:expenseId",
+  validateExpenseInput,
+  handleInputErrors,
+  ExpensesController.updateById
+);
+
+router.delete("/:budgetId/expenses/:expenseId", ExpensesController.deleteById);
 
 export default router;

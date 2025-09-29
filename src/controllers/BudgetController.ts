@@ -23,7 +23,10 @@ export class BudgetController {
   };
 
   static getById = async (req: Request, res: Response) => {
-    res.json(req.budget);
+    const budget = await Budget.findByPk(req.budget.id, {
+      include: ["expenses"],
+    });
+    res.json(budget);
   };
 
   static updateById = async (req: Request, res: Response) => {
@@ -33,6 +36,6 @@ export class BudgetController {
 
   static deleteById = async (req: Request, res: Response) => {
     await req.budget.destroy();
-      res.json("Presupuesto eliminado correctamente");
+    res.json("Presupuesto eliminado correctamente");
   };
 }
