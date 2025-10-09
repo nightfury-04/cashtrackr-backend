@@ -88,4 +88,5 @@ export const hasAccess = async (
     const error = new Error("Acción no válida");
     return res.status(401).json({ error: error.message });
   }
+  next();
 }
