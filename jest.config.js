@@ -7,5 +7,7 @@ module.exports = {
   testEnvironment: "node",
   transform: {
     ...tsJestTransformCfg,
+    // openHandlesTimeout: 10 * 1000,
+    // testTimeout: 10 * 1000,
   },
 };
