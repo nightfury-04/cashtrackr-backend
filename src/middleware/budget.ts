@@ -18,8 +18,10 @@ export const validateBudgetId = async (
   await param("id")
     .isInt()
     .withMessage("ID no válido")
+    .bail()
     .custom((value) => value > 0)
     .withMessage("ID no válido")
+    .bail()
     .run(req);
 
   let errors = validationResult(req);
@@ -84,9 +86,9 @@ export const hasAccess = async (
   res: Response,
   next: NextFunction
 ) => {
-  if(req.budget.userId !== req.user.id) {
+  if (req.budget.userId !== req.user.id) {
     const error = new Error("Acción no válida");
     return res.status(401).json({ error: error.message });
   }
   next();
-}
+};

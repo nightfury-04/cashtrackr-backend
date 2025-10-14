@@ -413,4 +413,108 @@ describe("GET /api/budgets/:id", () => {
     expect(response.status).toBe(401);
     expect(response.body.error).toBe("No autorizado");
   });
+
+  it("Should return 400 bad request when id is not valid", async () => {
+    const response = await request(server)
+      .get("/api/budgets/not_valid")
+      .auth(jwt, { type: "bearer" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeDefined();
+    expect(response.body.errors).toBeTruthy();
+    expect(response.body.errors).toHaveLength(1);
+    expect(response.body.errors[0].msg).toBe("ID no válido");
+    expect(response.status).not.toBe(401);
+    expect(response.body.error).not.toBe("No autorizado");
+  });
+
+  it("Should return 404 error when a budget does not exist", async () => {
+    const response = await request(server)
+      .get("/api/budgets/300")
+      .auth(jwt, { type: "bearer" });
+
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe("Presupuesto no encontrado");
+    expect(response.status).not.toBe(400);
+    expect(response.status).not.toBe(401);
+  });
+
+  it("Should return a single budget by id", async () => {
+    const response = await request(server)
+      .get("/api/budgets/1")
+      .auth(jwt, { type: "bearer" });
+
+    expect(response.status).toBe(200);
+    expect(response.status).not.toBe(400);
+    expect(response.status).not.toBe(401);
+    expect(response.status).not.toBe(404);
+  });
+});
+
+describe("PUT /api/budgets/:id", () => {
+  beforeAll(async () => {
+    await authenticateUser();
+  });
+
+  it("Should reject unauthenticated put request to budget id without a jwt", async () => {
+    const response = await request(server).put("/api/budgets/1");
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("No autorizado");
+  });
+
+  it("Should display validation errors if the form is empty", async () => {
+    const response = await request(server)
+      .put("/api/budgets/3000")
+      .auth(jwt, { type: "bearer" })
+      .send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toBeTruthy();
+    expect(response.body.errors).toHaveLength(4);
+  });
+
+  it("Should update a budget by id and return a sucess message", async () => {
+    const response = await request(server)
+      .put("/api/budgets/3000")
+      .auth(jwt, { type: "bearer" })
+      .send({
+        name: "Updated Budget",
+        amount: 300,
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBe("Presupuesto actualizado correctamente");
+  });
+});
+
+describe("DELETE /api/budgets/:id", () => {
+  beforeAll(async () => {
+    await authenticateUser();
+  });
+
+  it("Should reject unauthenticated put request to budget id without a jwt", async () => {
+    const response = await request(server).delete("/api/budgets/1");
+
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe("No autorizado");
+  });
+
+  it("Should return 404 not found when a budget doesnt exists", async () => {
+    const response = await request(server)
+      .delete("/api/budgets/1")
+      .auth(jwt, { type: "bearer" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBe("Presupuesto no encontrado");
+  });
+
+  it("Should delete a budget and return a success message", async () => {
+    const response = await request(server)
+      .delete("/api/budgets/1")
+      .auth(jwt, { type: "bearer" });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBe("Presupuesto eliminado");
+  });
 });
