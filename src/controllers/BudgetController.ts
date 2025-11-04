@@ -9,7 +9,7 @@ export class BudgetController {
         order: [["createdAt", "DESC"]],
         where: {
           userId: req.user.id,
-        }
+        },
       });
       res.json(budgets);
     } catch (error) {
@@ -22,8 +22,8 @@ export class BudgetController {
     try {
       const budget = await Budget.create(req.body);
       budget.userId = req.user.id;
-      await budget.save();
-      res.status(201).json("Presupuesto creado correctamente");
+      const savedBudget = await budget.save();
+      res.status(201).json(savedBudget);
     } catch (error) {
       // console.log(error);
       res.status(500).json({ error: "Hubo un error" });
