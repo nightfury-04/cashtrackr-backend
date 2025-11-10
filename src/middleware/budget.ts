@@ -15,7 +15,7 @@ export const validateBudgetId = async (
   res: Response,
   next: NextFunction
 ) => {
-  await param("id")
+  await param("budgetId")
     .isInt()
     .withMessage("ID no válido")
     .bail()
