@@ -21,9 +21,7 @@ router.post(
 
 router.post(
   "/confirm-account",
-  body("token")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("Token no válido"),
+  body("token").isLength({ min: 6, max: 6 }).withMessage("Token no válido"),
   handleInputErrors,
   AuthController.confirmAccount
 );
@@ -89,6 +87,15 @@ router.post(
     .withMessage("El password actual no puede ir vacío"),
   handleInputErrors,
   AuthController.checkPassword
+);
+
+router.put(
+  "/update-profile",
+  authenticate,
+  body("name").notEmpty().withMessage("El nombre no puede ir vacío"),
+  body("email").isEmail().withMessage("Email no válido"),
+  handleInputErrors,
+  AuthController.updateProfile
 );
 
 export default router;
